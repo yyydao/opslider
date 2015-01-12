@@ -1,13 +1,13 @@
 {
   "name": "opslider",
-  "version": "0.0.1",
-  "description": "single page slider for mobile and wechat",
+  "version": "0.0.2",
+  "description": "",
   "keywords": [],
   "homepage": "",
-  "author": "yyydao <yyydao11@gmail.com>",
+  "author": "",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git://github.com/yyydao/opslider"
   },
   "bugs": {
     "url": ""
@@ -16,7 +16,6 @@
   "spm": {
     "main": "index.js",
     "dependencies": {
-        "eventor":"0.0.3"
     },
     "devDependencies": {
       "expect.js": "0.3.1"
