@@ -5,22 +5,8 @@
 ## Normal usage
 <style>
 
-@charset "utf-8";
-html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    padding: 0;
-    width: 100%;
-}
-body {
-    background-color: #fff;
-    color: #fff;
-    font-family: "Helvetica Neue",Helvetica,STHeiTi,sans-serif;
-    margin: 0;
-}
-div, section {
-    display: block;
+slider-wrap{
+    overflow:hidden;
 }
 slider {
     backface-visibility: hidden;
@@ -793,34 +779,133 @@ slider page .ani-hidden {
 .ani.rubberband-y {
     animation-name: rubberband-y;
 }
+ .title{
+    font-style: italic;
+    font-size: 42px;
+    margin-top: 80px;
+    margin-bottom: 0;
+    line-height: 45px;
+    text-align: center;
+    color: #fff;
+}
+.subtitle{
+    font-style: italic;
+    font-size: 25px;
+    text-align: center;
+    color: #fff;
+}
 
+/**********第一屏*********/
+.home{
+    background-color: #45b19a;
+}
+/*************第二屏**************/
+.info{
+    background-color: #ff787a;
+}
+/**************第三屏*****************/
+.job{
+    background-color: #80ac50;
+}
 </style>
 
-<slider>
-            <wrapper>
-                <!--第一屏-->
-                <page class="home">
-                    <div class="title">垂直模式</div>
-                    <div class="subtitle">请向上或向下滑</div>
-                </page>
-                <!--第二屏-->
-                <page class="info">
-                    <div class="title ani fade-in-down">Slide2</div>
-                </page>
-                <!--第三屏-->
-                <page class="job">
-                   <div class="title ani elastic-out">Slide3</div>
-                </page>
-            </wrapper>
-        </slider>
-
+<div id="slider-wrap">
+    <slider>
+        <wrapper>
+            <!--第一屏-->
+            <page class="home">
+                <div class="title">垂直模式</div>
+                <div class="subtitle">请向上或向下滑</div>
+            </page>
+            <!--第二屏-->
+            <page class="info">
+                <div class="title ani fade-in-down">Slide2</div>
+            </page>
+            <!--第三屏-->
+            <page class="job">
+               <div class="title ani elastic-out">Slide3</div>
+            </page>
+        </wrapper>
+    </slider>
+</div>
 
 ````javascript
 seajs.use('index', function(opslider) {
    var container = document.querySelector('slider');
-      var slider = opslider.define(container,{
-          mode: 'vertical'//horizontal vertica
-      });
+   var slider = opslider.define(container,{
+        mode:'vertical',
+        animation:'scale',
+        onSlideChanged:function(){
+            var  index = this.currentIndex,
+                 loopindex = this.loopIndex;
+           
+        }
+   });
+   
+   opslider.addAnimate('scale',function(slider){
+        var current = slider.getSlide(slider.currentIndex);
+        var isH = slider.params.mode == 'horizontal';
+        var util = slider.util;
+        console.log(current);
+        return{
+            onFirstInit: function(){
+            },
+            onSetWrapperTransform:function(transform){
+                //console.log('transform',transform);
+                console.log(util);
+                var scale,
+                    offsetCenter  = isH ? -transform.x : -transform.y,
+                    wrapperSize = isH ? slider.width : slider.height;
+                 for (var i=0,len = slider.slides.length; i < len; i++) {
+                                var slide = slider.slides[i],
+                                    progress = (offsetCenter - slide.offsetSize) / slide.size;
+                                var translate,
+                                    boxShadow;
+                                if (progress>0) {
+                                    translate = progress * wrapperSize;
+                                    boxShadowOpacity = 0;
+                                }
+                                else {
+                                    translate=0;
+                                    boxShadowOpacity = 1  - Math.min(Math.abs(progress),1);
+                                }
+                                slide.style.boxShadow='0px 0px 10px rgba(0,0,0,'+boxShadowOpacity+')';
+                                util.setTransform(slide,'scale('+offsetCenter/wrapperSize+')');
+                            }    
+            },
+            onSetWrapperTransition:function(duration){
+                console.log('transform',duration);
+            }
+        }
+   })
 });
 ````
 
+## API & Property
+ 
+---
+###API
+
+goTo(n): 大家都爱的goto,跳到第n张
+next()： 下一个
+prev()： 上一个
+getSlide(index)	Number	获得某一帧
+
+###Property
+currentIndex:当前帧索引值
+loopIndex:循环模式下的索引值
+slides[]:包含所有帧的数组
+width:容器的宽度
+height:容器的高度
+previousIndex:上一页（下一页）索引值
+isH:是否水平模式
+onSlideChanged(callback) : 切换时触发内部的callback
+
+
+## Plugin
+---
+animate: 自定义动画
+//@todo:
+
+plugin：自定义插件
+//@todo:

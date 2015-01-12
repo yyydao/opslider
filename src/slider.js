@@ -158,7 +158,7 @@ Slider.prototype = {
     },
     //初始化TouchStart/TouchMove/TouchEnd/Resize事件
     bindEvent: function(){
-        var bind = util.addEventListener
+        var bind = util.addEventListener,
         self = this;
         var hasTouch = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 
@@ -274,7 +274,7 @@ Slider.prototype = {
 
         //检查是否小于边界或大于边界
         //用于重置当前帧
-        if(Math.abs(diff) < 50 || this.positioins.current > 0 || this.positioins.current < maxPosition){
+        if(Math.abs(diff) < threshold || this.positioins.current > 0 || this.positioins.current < maxPosition){
             this.resetSlide();
             this.triggerAnimate('onTouchEnd');
             return;
@@ -324,7 +324,7 @@ Slider.prototype = {
     },
     //修复自动循环
     fixLoop: function(){
-        var newIndex
+        var newIndex,
         slidesLength = this.slides.length;
 
         if (this.currentIndex < 1) {
@@ -370,7 +370,7 @@ Slider.prototype = {
         this.updateActiveSlide(position);
 
         if(action ==='prev' || action === 'next' || (action === 'to' && runCallback === true)){
-            if(this.params.onSlideChanged) this.params.onSlideChanged.call(this);
+            if(this.params.onSlideChanged) this.params.onSlideChanged.call(this);console.log('this',this);
         }
     },
     //重置帧
@@ -615,6 +615,8 @@ Slider.prototype = {
         var es = this.wrapper.style;
         es.webkitTransitionDuration = es.MsTransitionDuration = es.msTransitionDuration = es.MozTransitionDuration = es.OTransitionDuration = es.transitionDuration = (duration / 1000) + 's';
         this.triggerAnimate('onSetWrapperTransition',duration);
-    }
+    },
+
+    util:util
 };
 module.exports = Slider;
