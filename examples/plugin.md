@@ -1,7 +1,7 @@
-# Demo
+#Plugin
 
-- order: 1
----
+- order:3
+-----
 
 <style>
 
@@ -810,163 +810,82 @@ slider page .ani-hidden {
 }
 </style>
 
-## Normal usage
-
-
+## 转屏提示插件
 
 <div id="slider-wrap">
     <slider>
         <wrapper>
             <!--第一屏-->
-            <page class="home" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/1.png);background-size: contain">
-              
+            <page class="home">
+                
             </page>
             <!--第二屏-->
-            <page class="info" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/2.png);background-size: contain">
-              
+            <page class="info">
+                
             </page>
             <!--第三屏-->
-            <page class="job" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/3.png);background-size: contain">
-              
+            <page class="job">
+               
             </page>
         </wrapper>
     </slider>
 </div>
 
+##方法
+###onFirstInit
+首次初始化，只调用一次（执行时不会调用onInit方法），resize时不调用
+###onInit
+resize时会再次调用
 
-###html结构
 
-````html
-<slider>
-    <wrapper>
-        <!--第一屏-->
-        <page>
-        </page>
-        <!--第二屏-->
-        <page>
-        </page>
-        <!--第三屏-->
-        <page>
-        </page>
-    </wrapper>
-</slider>
-````
-###必要css
-````css
-slider-wrap{
-    overflow:hidden;
-}
-slider {
-    backface-visibility: hidden;
-    display: block;
-    margin: 0 auto;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-}
-slider wrapper {
-    box-sizing: content-box;
-    display: block;
-    position: relative;
-    transform: translate3d(0px, 0px, 0px);
-    transition-duration: 0s;
-    transition-property: transform, left, top;
-    transition-timing-function: ease;
-    width: 100%;
-}
-slider page {
-    box-sizing: content-box;
-    display: block;
-    float: left;
-    height: 100%;
-    position: relative;
-    width: 100%;
-    background-size:contain;
-}
-slider page .ani-hidden {
-    display: none;
-}
-````
-###js代码
 ````javascript
 seajs.use('index', function(opslider) {
     var container = document.querySelector('slider');
     var slider = opslider.define(container,{
-        //展示模式,水平(horizontal)或垂直(vertical)
-        mode: 'vertical',
-        //是否循环
+        mode: 'horizontal',
         loop: false,
-        //自定义动画效果,为空则是默认效果
-        animation:'',
-        //插件
-        plugins:[],
-        //是否平铺整个屏幕，默认为true
-        isOverspread:true,
-        //转帧时触发
-        onSlideChanged:function(){
-            //@todo
-        }
+        plugin:'landscapeTip'
     });
+   opslider.addPlugin('landscapeTip', function (slider) {
+       var landscapeTipClass = 'landscape-tip',
+           landscapeTipContentClass = 'content',
+           supportOrientation = (typeof window.orientation == 'number'
+               && typeof window.onorientationchange == 'object'),
+           orientation = 0;    
+       function updateOrientation() {
+           //检查是否竖屏
+           var landscapeTip = document.querySelector('.' + landscapeTipClass);
+           if (supportOrientation) {
+               orientation = window.orientation;
+           } else {
+               orientation = (window.innerWidth > window.innerHeight) ? 90 : 0;
+           }
+           if (orientation === 0) {
+               landscapeTip && (landscapeTip.style.display = 'none');
+           } else {
+               landscapeTip && (landscapeTip.style.display = 'block');
+           }
+       }   
+       return {
+           onInit: function () {
+               //确保DOM树中只有一个landscapeTip
+               if (document.querySelectorAll('.' + landscapeTipClass).length >= 1) return;   
+               var wrapper = document.createElement("div"),
+                   content = document.createElement("div");   
+               wrapper.classList.add(landscapeTipClass);
+               content.classList.add(landscapeTipContentClass);
+               document.body.appendChild(wrapper);   
+               wrapper.appendChild(content);   
+               var text = document.createTextNode("为了更好的体验,请使用竖屏浏览");
+               content.appendChild(text);   
+               updateOrientation();   
+               if (supportOrientation) {
+                   window.addEventListener('orientationchange', updateOrientation, false);
+               } else {
+                   window.addEventListener('resize', updateOrientation, false);
+               }   
+           }
+       };
+   });
 });
-````
-
-## Method && Property
-
-方法列表。 
-----
-###goTo(n)
-大家都爱的goto,跳到第n张
-
-###next()
-到下一张
-
-###prev() 
-到上一张
-
-###getSlide(index)
-获得某一张的具体属性
-
-内部属性列表。
----
-###currentIndex
-当前帧索引值
-
-###loopIndex
-循环模式下的索引值
-
-###slides[]
-包含所有帧的数组
-
-###width
-容器的宽度
-
-###height
-容器的高度
-
-###previousIndex
-上一页（下一页）索引值
-
-###isH
-是否水平模式
-
-###onSlideChanged(callback)
-切换时触发内部的callback
-
-
-````
-seajs.use('index', function(opslider) {
-    var slider = opslider.define(container,{
-        onSlideChanged:function(){
-            //访问当前索引
-            var index = this.currentIndex;
-        }
-    });
-    //下一页
-    slider.next();
-    //上一页
-    slider.prev();
-    //获得第二帧
-    var page = slider.getSlide(2);
-//....
-}
 ````

@@ -1,7 +1,7 @@
-# Demo
+#动画插件
 
-- order: 1
----
+- order：2
+-----
 
 <style>
 
@@ -810,163 +810,103 @@ slider page .ani-hidden {
 }
 </style>
 
-## Normal usage
-
-
+## 动画效果
 
 <div id="slider-wrap">
     <slider>
         <wrapper>
             <!--第一屏-->
-            <page class="home" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/1.png);background-size: contain">
-              
+            <page class="home">
+                
             </page>
             <!--第二屏-->
-            <page class="info" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/2.png);background-size: contain">
-              
+            <page class="info">
+                
             </page>
             <!--第三屏-->
-            <page class="job" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/3.png);background-size: contain">
-              
+            <page class="job">
+               
             </page>
         </wrapper>
     </slider>
 </div>
 
+##方法
+###onFirstInit
+首次初始化，只调用一次（执行时不会调用onInit方法），resize时不调用
+###onInit
+resize时会再次调用
+###onTouchStart
+touchstart时触发
+###onTouchMove
+touchmove时触发
+###onTouchEnd
+touchend时触发
+###onSetWrapperTransform(transform)
+设置容器element的transform时触发，返回transform对象，对象属性为x,y,z坐标的值
+###onSetWrapperTransition(duration)
+duration为Number型
 
-###html结构
 
-````html
-<slider>
-    <wrapper>
-        <!--第一屏-->
-        <page>
-        </page>
-        <!--第二屏-->
-        <page>
-        </page>
-        <!--第三屏-->
-        <page>
-        </page>
-    </wrapper>
-</slider>
-````
-###必要css
-````css
-slider-wrap{
-    overflow:hidden;
-}
-slider {
-    backface-visibility: hidden;
-    display: block;
-    margin: 0 auto;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-}
-slider wrapper {
-    box-sizing: content-box;
-    display: block;
-    position: relative;
-    transform: translate3d(0px, 0px, 0px);
-    transition-duration: 0s;
-    transition-property: transform, left, top;
-    transition-timing-function: ease;
-    width: 100%;
-}
-slider page {
-    box-sizing: content-box;
-    display: block;
-    float: left;
-    height: 100%;
-    position: relative;
-    width: 100%;
-    background-size:contain;
-}
-slider page .ani-hidden {
-    display: none;
-}
-````
-###js代码
+设置容器element的transitionduration时触发
+
 ````javascript
 seajs.use('index', function(opslider) {
     var container = document.querySelector('slider');
     var slider = opslider.define(container,{
-        //展示模式,水平(horizontal)或垂直(vertical)
-        mode: 'vertical',
-        //是否循环
+        mode: 'horizontal',
         loop: false,
-        //自定义动画效果,为空则是默认效果
-        animation:'',
-        //插件
-        plugins:[],
-        //是否平铺整个屏幕，默认为true
-        isOverspread:true,
-        //转帧时触发
-        onSlideChanged:function(){
-            //@todo
-        }
+        //调用下面定义的动画插件 'cover'
+        animation:'cover'
+    });
+   opslider.addAnimate('cover',function(slider){
+        var isH = slider.params.mode == 'horizontal';
+        function initSlide(){
+            for (var i=0; i<slider.slides.length; i++) {
+                var slide = slider.slides[i];
+                slide.size = parseInt(slide.getAttribute('data-page-size'),10);
+                slide.offsetSize = i  *  slide.size;
+            }
+        };
+        return {
+            onFirstInit: function(){
+                initSlide();
+            },
+            onInit: function(){
+                initSlide();
+            },
+            onSetWrapperTransform: function(transform){
+                var transform = transform || {x:0, y:0, z:0},
+                    offsetCenter  = isH ? -transform.x : -transform.y
+                    wrapperSize = isH ? slider.width : slider.height;
+                for (var i=0,len = slider.slides.length; i < len; i++) {
+                    var slide = slider.slides[i],
+                        progress = (offsetCenter - slide.offsetSize) / slide.size;
+                    var translate,
+                        boxShadow;
+                    if (progress>0) {
+                        translate = progress * wrapperSize;
+                        boxShadowOpacity = 0;
+                    }
+                    else {
+                        translate=0;
+                        boxShadowOpacity = 1  - Math.min(Math.abs(progress),1);
+                    }
+                    slide.style.boxShadow='0px 0px 10px rgba(0,0,0,'+boxShadowOpacity+')';
+                    util.setTransform(slide,isH ? 'translate3d('+translate+'px,0,0)' : 'translate3d(0,'+translate+'px,0)');
+                }
+            },
+            onSetWrapperTransition:function(duration){
+                for (var i = 0; i < slider.slides.length; i++){
+                  util.setTransition(slider.slides[i], duration);
+                }
+            },
+            onTouchStart: function(){
+                for (var i = 0; i < slider.slides.length; i++){
+                    util.setTransition(slider.slides[i], 0);
+                }
+            }
+        };
     });
 });
-````
-
-## Method && Property
-
-方法列表。 
-----
-###goTo(n)
-大家都爱的goto,跳到第n张
-
-###next()
-到下一张
-
-###prev() 
-到上一张
-
-###getSlide(index)
-获得某一张的具体属性
-
-内部属性列表。
----
-###currentIndex
-当前帧索引值
-
-###loopIndex
-循环模式下的索引值
-
-###slides[]
-包含所有帧的数组
-
-###width
-容器的宽度
-
-###height
-容器的高度
-
-###previousIndex
-上一页（下一页）索引值
-
-###isH
-是否水平模式
-
-###onSlideChanged(callback)
-切换时触发内部的callback
-
-
-````
-seajs.use('index', function(opslider) {
-    var slider = opslider.define(container,{
-        onSlideChanged:function(){
-            //访问当前索引
-            var index = this.currentIndex;
-        }
-    });
-    //下一页
-    slider.next();
-    //上一页
-    slider.prev();
-    //获得第二帧
-    var page = slider.getSlide(2);
-//....
-}
 ````

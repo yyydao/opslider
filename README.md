@@ -1,18 +1,20 @@
-# opslide [![spm version](https://moekit.timo.today/badge/opslide)](https://moekit.timo.today/package/opslide)
+# opslider [![spm version](http://spmjs.io/badge/opslider)](http://spmjs.io/package/opslider)
 
 ---
 
-single page slider for mobile and wechat
+An awesome spm package!
+
+---
 
 ## Install
 
 ```
-$ spm install opslide --save
+$ spm install opslider --save
 ```
 
 ## Usage
 
 ```js
-var opslide = require('opslide');
-// use opslide
+var opslider = require('opslider');
+// use opslider
 ```
