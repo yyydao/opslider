@@ -1,7 +1,6 @@
 var opslider;
 
-
-var Slider =require('./src/slider');
+var Slider =require('./src/slider'),
     animateM =require('./src/animateManager'),
     pluginM =require('./src/pluginManager'),
     util =require('./src/util');

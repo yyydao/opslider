@@ -1,8 +1,8 @@
 # Demo
 
+- order: 1
 ---
 
-## Normal usage
 <style>
 
 slider-wrap{
@@ -33,6 +33,7 @@ slider page {
     height: 100%;
     position: relative;
     width: 100%;
+    background-size:contain;
 }
 slider page .ani-hidden {
     display: none;
@@ -809,103 +810,163 @@ slider page .ani-hidden {
 }
 </style>
 
+## Normal usage
+
+
+
 <div id="slider-wrap">
     <slider>
         <wrapper>
             <!--第一屏-->
-            <page class="home">
-                <div class="title">垂直模式</div>
-                <div class="subtitle">请向上或向下滑</div>
+            <page class="home" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/1.png);background-size: contain">
+              
             </page>
             <!--第二屏-->
-            <page class="info">
-                <div class="title ani fade-in-down">Slide2</div>
+            <page class="info" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/2.png);background-size: contain">
+              
             </page>
             <!--第三屏-->
-            <page class="job">
-               <div class="title ani elastic-out">Slide3</div>
+            <page class="job" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/3.png);background-size: contain">
+              
             </page>
         </wrapper>
     </slider>
 </div>
 
+
+###html结构
+
+````html
+<slider>
+    <wrapper>
+        <!--第一屏-->
+        <page>
+        </page>
+        <!--第二屏-->
+        <page>
+        </page>
+        <!--第三屏-->
+        <page>
+        </page>
+    </wrapper>
+</slider>
+````
+###必要css
+````css
+slider-wrap{
+    overflow:hidden;
+}
+slider {
+    backface-visibility: hidden;
+    display: block;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+slider wrapper {
+    box-sizing: content-box;
+    display: block;
+    position: relative;
+    transform: translate3d(0px, 0px, 0px);
+    transition-duration: 0s;
+    transition-property: transform, left, top;
+    transition-timing-function: ease;
+    width: 100%;
+}
+slider page {
+    box-sizing: content-box;
+    display: block;
+    float: left;
+    height: 100%;
+    position: relative;
+    width: 100%;
+    background-size:contain;
+}
+slider page .ani-hidden {
+    display: none;
+}
+````
+###js代码
 ````javascript
 seajs.use('index', function(opslider) {
-   var container = document.querySelector('slider');
-   var slider = opslider.define(container,{
-        mode:'vertical',
-        animation:'scale',
+    var container = document.querySelector('slider');
+    var slider = opslider.define(container,{
+        //展示模式,水平(horizontal)或垂直(vertical)
+        mode: 'vertical',
+        //是否循环
+        loop: false,
+        //自定义动画效果,为空则是默认效果
+        animation:'',
+        //插件
+        plugins:[],
+        //是否平铺整个屏幕，默认为true
+        isOverspread:true,
+        //转帧时触发
         onSlideChanged:function(){
-            var  index = this.currentIndex,
-                 loopindex = this.loopIndex;
-           
+            //@todo
         }
-   });
-   
-   opslider.addAnimate('scale',function(slider){
-        var current = slider.getSlide(slider.currentIndex);
-        var isH = slider.params.mode == 'horizontal';
-        var util = slider.util;
-        console.log(current);
-        return{
-            onFirstInit: function(){
-            },
-            onSetWrapperTransform:function(transform){
-                //console.log('transform',transform);
-                console.log(util);
-                var scale,
-                    offsetCenter  = isH ? -transform.x : -transform.y,
-                    wrapperSize = isH ? slider.width : slider.height;
-                 for (var i=0,len = slider.slides.length; i < len; i++) {
-                                var slide = slider.slides[i],
-                                    progress = (offsetCenter - slide.offsetSize) / slide.size;
-                                var translate,
-                                    boxShadow;
-                                if (progress>0) {
-                                    translate = progress * wrapperSize;
-                                    boxShadowOpacity = 0;
-                                }
-                                else {
-                                    translate=0;
-                                    boxShadowOpacity = 1  - Math.min(Math.abs(progress),1);
-                                }
-                                slide.style.boxShadow='0px 0px 10px rgba(0,0,0,'+boxShadowOpacity+')';
-                                util.setTransform(slide,'scale('+offsetCenter/wrapperSize+')');
-                            }    
-            },
-            onSetWrapperTransition:function(duration){
-                console.log('transform',duration);
-            }
-        }
-   })
+    });
 });
 ````
 
-## API & Property
- 
+## Method && Property
+
+方法列表。 
+----
+###goTo(n)
+大家都爱的goto,跳到第n张
+
+###next()
+到下一张
+
+###prev() 
+到上一张
+
+###getSlide(index)
+获得某一张的具体属性
+
+内部属性列表。
 ---
-###API
+###currentIndex
+当前帧索引值
 
-goTo(n): 大家都爱的goto,跳到第n张
-next()： 下一个
-prev()： 上一个
-getSlide(index)	Number	获得某一帧
+###loopIndex
+循环模式下的索引值
 
-###Property
-currentIndex:当前帧索引值
-loopIndex:循环模式下的索引值
-slides[]:包含所有帧的数组
-width:容器的宽度
-height:容器的高度
-previousIndex:上一页（下一页）索引值
-isH:是否水平模式
-onSlideChanged(callback) : 切换时触发内部的callback
+###slides[]
+包含所有帧的数组
+
+###width
+容器的宽度
+
+###height
+容器的高度
+
+###previousIndex
+上一页（下一页）索引值
+
+###isH
+是否水平模式
+
+###onSlideChanged(callback)
+切换时触发内部的callback
 
 
-## Plugin
----
-animate: 自定义动画
-//@todo:
-
-plugin：自定义插件
-//@todo:
+````
+seajs.use('index', function(opslider) {
+    var slider = opslider.define(container,{
+        onSlideChanged:function(){
+            //访问当前索引
+            var index = this.currentIndex;
+        }
+    });
+    //下一页
+    slider.next();
+    //上一页
+    slider.prev();
+    //获得第二帧
+    var page = slider.getSlide(2);
+//....
+}
+````

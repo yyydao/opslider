@@ -370,7 +370,7 @@ Slider.prototype = {
         this.updateActiveSlide(position);
 
         if(action ==='prev' || action === 'next' || (action === 'to' && runCallback === true)){
-            if(this.params.onSlideChanged) this.params.onSlideChanged.call(this);console.log('this',this);
+            if(this.params.onSlideChanged) this.params.onSlideChanged.call(this);
         }
     },
     //重置帧
@@ -548,7 +548,6 @@ Slider.prototype = {
     triggerPlugin:function(method,args){
         var plugin,
             self = this;
-
         self.params.plugins.forEach(function(name){
             if(pluginManager.exists(name)){
                 plugin = pluginManager.get(name)(self);
