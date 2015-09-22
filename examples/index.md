@@ -811,22 +811,19 @@ slider page .ani-hidden {
 </style>
 
 ## Normal usage
-
-
-
 <div id="slider-wrap">
     <slider>
         <wrapper>
             <!--第一屏-->
-            <page class="home" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/1.png);background-size: contain">
+            <page class="home" style="background: url(http://192.168.80.237:8004/zt/nanshenjing/img/index-page.png);background-size: contain">
               
             </page>
             <!--第二屏-->
-            <page class="info" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/2.png);background-size: contain">
+            <page class="info" style="background: url(http://192.168.80.237:8004/zt/nanshenjing/img/guide01.png);background-size: contain">
               
             </page>
             <!--第三屏-->
-            <page class="job" style="background: url(http://192.168.80.107:8004/zt/wechat_template/img/3.png);background-size: contain">
+            <page class="job" style="background: url(http://192.168.80.237:8004/zt/nanshenjing/img/guide02.png);background-size: contain">
               
             </page>
         </wrapper>
@@ -889,7 +886,7 @@ slider page .ani-hidden {
 ````
 ###js代码
 ````javascript
-seajs.use('index', function(opslider) {
+var opslider = require('opslider');
     var container = document.querySelector('slider');
     var slider = opslider.define(container,{
         //展示模式,水平(horizontal)或垂直(vertical)
@@ -907,7 +904,6 @@ seajs.use('index', function(opslider) {
             //@todo
         }
     });
-});
 ````
 
 ## Method && Property
@@ -954,7 +950,7 @@ seajs.use('index', function(opslider) {
 
 
 ````
-seajs.use('index', function(opslider) {
+var opslider = require('opslider');
     var slider = opslider.define(container,{
         onSlideChanged:function(){
             //访问当前索引
@@ -968,5 +964,4 @@ seajs.use('index', function(opslider) {
     //获得第二帧
     var page = slider.getSlide(2);
 //....
-}
 ````

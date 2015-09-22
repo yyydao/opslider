@@ -41,6 +41,12 @@ var util = {
         }
         el.addEventListener(event, listener, useCapture);
     },
+    removeEventListener:function(el, event, listener, useCapture){
+        if (typeof useCapture === 'undefined') {
+            useCapture = false;
+        }
+        el.removeEventListener(event, listener, useCapture);
+    },
     extend: function(target, source){
         for (var prop in source) {
             if (prop in target && typeof target[prop] === 'object') {
